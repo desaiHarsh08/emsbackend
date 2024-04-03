@@ -23,8 +23,8 @@ const sendOTP = async (recipientEmail, otp, username) => {
 
 export const generateOTP = async (req, res) => {
 
-     const interaktApiKey = process.env.INTERAKT_API_KEY;
-  const interaktBaseUrl = process.env.INTERAKT_BASE_URL;
+    const interaktApiKey = process.env.INTERAKT_API_KEY;
+    const interaktBaseUrl = process.env.INTERAKT_BASE_URL;
 
     try {
         console.log(req.body.email)

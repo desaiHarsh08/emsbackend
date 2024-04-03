@@ -122,7 +122,7 @@ export const getByRoleAndExamNameAndDate = async (req, res) => {
         console.log(userType, examName, examDate+'T00:00:00.000+00:00')
         let userArr = [];
         if (userType === "INVIGILATOR") {
-            userArr = await Invigilator.find({userType, examName, examDate: examDate+'T00:00:00.000+00:00'});
+            userArr = await Invigilator.find({userType, examName, examDate: examDate});
         }
         else if (userType === "EXAM_OC") {
             userArr = await ExamOC.find({userType, examName, examDate});

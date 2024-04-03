@@ -88,14 +88,20 @@ export const getStudents = async (req, res) => {
     const { examName, examDate, floorNumber, roomNumber } = req.body;
     console.log(examName, examDate, floorNumber, roomNumber)
     try {
-        const students = await Student.find({
+        let students = await Student.find({
             'examDetails.examName': examName,
             'examDetails.examDate': examDate,
             'examDetails.floorNumber': floorNumber,
             'examDetails.roomNumber': roomNumber
         });
+        console.log(students);
         if (students.length === 0) {
-            return res.status(404).json(new ApiResponse(404, null, "NO STUDENT FOUND...!"));
+            students = await Student.find({
+                'examDetails.examName': examName,
+                'examDetails.examDate': examDate,
+                'examDetails.floorNumber': floorNumber,
+                'examDetails.roomNumber': roomNumber + ' '
+            });
         }
 
         return res.status(200).json(new ApiResponse(200, students, "STUDENTS FETCHED...!"));
