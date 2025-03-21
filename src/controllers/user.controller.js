@@ -1,3 +1,4 @@
+import { Exam } from "../models/exam.model.js";
 import { ExamOC } from "../models/exam_oc.model.js";
 import { Examiner } from "../models/examiner.model.js";
 import { Invigilator } from "../models/invigilator.model.js";
@@ -44,6 +45,9 @@ export const loginUser = async (req, res) => {
 
         console.log("Status: ", status);
 
+        const recentExam = await Exam.findOne().sort({ createdAt: -1 })
+        console.log(recentExam)
+
         if (status < 0) { // Expired OTP
             return res.status(401).json(new ApiResponse(401, status, "OTP GOT EXPIRED!"));
         }
@@ -56,14 +60,15 @@ export const loginUser = async (req, res) => {
             let user;
             let tmpArr = [];
             let examIds = [];
+            console.log(recentExam._id);
             for (let i = 0; i < userTypes.length; i++) {
-                if(i == 0) {
+                if (i == 0) {
                     user = await userTypes[i].findOne({ email: req.body.email });
                 }
                 else {
-                    tmpArr = await userTypes[i].find({email: req.body.email});
+                    tmpArr = await userTypes[i].find({ email: req.body.email, examId: recentExam._id }).sort({ createdAt: -1 });
                     console.log(tmpArr)
-                    for(let j = 0; j < tmpArr.length; j++) {
+                    for (let j = 0; j < tmpArr.length; j++) {
                         console.log('in loop:', tmpArr[j].examId);
                         examIds.push(tmpArr[j].examId);
                     }

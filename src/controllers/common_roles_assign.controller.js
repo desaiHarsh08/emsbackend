@@ -17,7 +17,12 @@ const sendEmail = async (recipientEmail, subject, body) => {
         },
         body: JSON.stringify({ recipientEmail, subject, body })
     });
-    console.log(await response.json(), subject)
+    try {
+        console.log(await response.json(), subject)
+    } catch (error) {
+        console.log(error)
+        
+    }
 }
 
 export const createRoleForUser = async (req, res) => {

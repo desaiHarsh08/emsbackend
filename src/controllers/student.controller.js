@@ -3,6 +3,7 @@ import { Exam } from "../models/exam.model.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { Student } from "../models/student.model.js";
 import ApiError from "../utils/ApiError.js";
+import { sendWhatsAppMessage } from "../services/whatsapp_messaging.js";
 
 // HELPER FUNCTIONS FOR PERFORMING SPECIFIC TASK: -
 
@@ -45,16 +46,48 @@ const convertTimeToAMPM = (timeString) => {
 
 // ADD A STUDENT
 export const createStudent = async (req, res) => {
-    const { studentName, studentUID, examDetails, isPresent } = req.body;
+    const { studentName, studentUID, foilNumber, examDetails, isPresent, whatsappNumber } = req.body;
     console.log(studentName, studentUID, examDetails, isPresent)
     try {
         const student = await Student.create({
             studentName,
             studentUID,
             examDetails,
-            isPresent
+            isPresent,
+            foilNumber,
+            whatsappNumber,
         });
-        return res.status(201).json(new ApiResponse(201, student, "STUDENT ADDED...!"));
+
+        const date = new Date(examDetails.examDate);
+        const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        console.log(formattedDate);
+
+        let waResult = { result: false };
+
+        try {
+            waResult = await sendWhatsAppMessage(
+                whatsappNumber,
+                [
+                    studentName,
+                    examDetails.examName,
+                    formattedDate,
+                    ` ${examDetails.examTime} - ${examDetails.endTime}`,
+                    ` ${examDetails.roomNumber}`,
+                    `${examDetails.floorNumber} `,
+                    ` ${examDetails.seatNumber}`,
+                    examDetails.examTime
+                ],
+                process.env.INTERAKT_API_KEY,
+                process.env.INTERAKT_BASE_URL,
+                "ems_class_assign"
+            );
+
+        } catch (error) {
+            console.log(error)
+            waResult = { result: false };
+        }
+
+        return res.status(201).json(new ApiResponse(201, { student, waResult }, "STUDENT ADDED...!"));
 
     } catch (error) {
         console.log(error)
@@ -193,9 +226,9 @@ export const getStudentsByAllotmentRegister = async (req, res) => {
         for (let i = startingRollNoIndex; i < total; i++) {
             arr.push(students[i]);
         }
-console.log(arr.length);
-console.log(`from roll: ${fromRollNo} | arr: ${arr[0].studentUID}`);
-console.log(`to roll: ${toRollNo} | arr: ${arr[arr.length - 1].studentUID}`);
+        console.log(arr.length);
+        console.log(`from roll: ${fromRollNo} | arr: ${arr[0].studentUID}`);
+        console.log(`to roll: ${toRollNo} | arr: ${arr[arr.length - 1].studentUID}`);
 
         return res.status(200).json(new ApiResponse(200, arr, "Allotment register list!"));
 

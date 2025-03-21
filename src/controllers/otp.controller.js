@@ -8,6 +8,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import ApiError from "../utils/ApiError.js";
 import fetch from "node-fetch"
 import { sendWhatsAppMessage } from "../services/whatsapp_messaging.js";
+import { Exam } from "../models/exam.model.js";
 
 
 const sendOTP = async (recipientEmail, otp, username) => {
@@ -31,8 +32,11 @@ export const generateOTP = async (req, res) => {
         const userTypes = [User, Invigilator, SupportStaff, Examiner, ExamOC];
         let user;
 
+        const recentExam = await Exam.findOne().sort({ createdAt: -1 })
+        console.log(recentExam)
+
         for (const userType of userTypes) {
-            user = await userType.findOne({ email: req.body.email });
+            user = await userType.findOne({ email: req.body.email,  });
             if (user) break;
         }
 

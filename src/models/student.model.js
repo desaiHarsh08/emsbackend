@@ -15,6 +15,14 @@ const studentSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    whatsappNumber: {
+        type: String,
+        default: ''
+    },
+    foilNumber: {
+        type: String,
+        default: ''
+    },
     examDetails: {
         examName: {
             type: String,
@@ -25,6 +33,10 @@ const studentSchema = new mongoose.Schema({
             default: Date.now
         },
         examTime: {
+            type: String,
+            default: ''
+        },
+        endTime: {
             type: String,
             default: ''
         },
