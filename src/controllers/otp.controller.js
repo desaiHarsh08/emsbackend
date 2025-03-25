@@ -19,7 +19,11 @@ const sendOTP = async (recipientEmail, otp, username) => {
         },
         body: JSON.stringify({ username, recipientEmail, otp })
     });
-    console.log(await response.json())
+    try {
+        console.log(await response.json())
+    } catch (error) {
+        
+    }
 }
 
 export const generateOTP = async (req, res) => {

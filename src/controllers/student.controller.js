@@ -65,6 +65,20 @@ export const createStudent = async (req, res) => {
         let waResult = { result: false };
 
         try {
+            let floorNumber = examDetails.floorNumber;
+            if (floorNumber.toString() === "1") {
+                floorNumber += "st";
+            }
+            else if (floorNumber.toString() === "2") {
+                floorNumber += "nd";
+            }
+            else if (floorNumber.toString() === "3") {
+                floorNumber += "rd";
+            }
+            else {
+                floorNumber += "th";
+            }
+
             waResult = await sendWhatsAppMessage(
                 whatsappNumber,
                 [
@@ -73,7 +87,7 @@ export const createStudent = async (req, res) => {
                     formattedDate,
                     ` ${examDetails.examTime} - ${examDetails.endTime}`,
                     ` ${examDetails.roomNumber}`,
-                    `${examDetails.floorNumber} `,
+                    `${floorNumber} `,
                     ` ${examDetails.seatNumber}`,
                     examDetails.examTime
                 ],
