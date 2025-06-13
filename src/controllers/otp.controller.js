@@ -9,6 +9,7 @@ import ApiError from "../utils/ApiError.js";
 import fetch from "node-fetch"
 import { sendWhatsAppMessage } from "../services/whatsapp_messaging.js";
 import { Exam } from "../models/exam.model.js";
+import { sendZeptoMail } from "../services/zept-email.js";
 
 
 const sendOTP = async (recipientEmail, otp, username) => {
@@ -62,7 +63,8 @@ export const generateOTP = async (req, res) => {
         const recipientNumber = user.phone;
         const messageArr = [otp];
         const data = await sendWhatsAppMessage(recipientNumber, messageArr, interaktApiKey, interaktBaseUrl, 'logincode');
-        sendOTP(user.email, otp, user.username);
+        // sendOTP(user.email, otp, user.username);
+        sendZeptoMail(user.email, "Verify your account for EMS Login.", `${otp} is your otp. This otp is only valid for 3 min.`, user.name)
         console.log(data);
 
         return res.status(201).json(new ApiResponse(201, otpObject, "Generated OTP...!"));
