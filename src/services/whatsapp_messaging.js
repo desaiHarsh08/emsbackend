@@ -1,11 +1,19 @@
+import 'dotenv/config';
+import { config } from 'dotenv';
+config({ path: './config.env' });
 import fetch from "node-fetch";
+
+const isDev = !process.env.NODE_ENV || process.env.NODE_ENV.trim() === '' || process.env.NODE_ENV == 'development';
+const DEVELOPER_PHONE = process.env.DEVELOPER_PHONE;
+const INTERAKT_BASE_URL = process.env.INTERAKT_BASE_URL;
 
 export const sendWhatsAppMessage = async (to, messageArr = [], interaktApiKey, interaktBaseUrl, templateName = 'logincode') => {
     console.log(to, messageArr, interaktApiKey, interaktBaseUrl, templateName);
+    console.log(`DEVELOPER_PHONE: ${DEVELOPER_PHONE}`)
     try {
         const requestBody = {
             countryCode: '+91',
-            phoneNumber: to,
+            phoneNumber: isDev ? `${DEVELOPER_PHONE}` : to,
             type: 'Template',
             template: {
                 name: templateName,
@@ -18,7 +26,7 @@ export const sendWhatsAppMessage = async (to, messageArr = [], interaktApiKey, i
             },
         };
         // 
-        const response = await fetch(`https://api.interakt.ai/v1/public/message/`, {
+        const response = await fetch(INTERAKT_BASE_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

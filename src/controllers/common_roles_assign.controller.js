@@ -9,21 +9,21 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import fetch from "node-fetch"
 
-const sendEmail = async (recipientEmail, subject, body) => {
-    const response = await fetch(`${process.env.EMAIL_API_URL}/send-email-v2`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ recipientEmail, subject, body })
-    });
-    try {
-        console.log(await response.json(), subject)
-    } catch (error) {
-        console.log(error)
+// const sendEmail = async (recipientEmail, subject, body) => {
+//     const response = await fetch(`${process.env.EMAIL_API_URL}/send-email-v2`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ recipientEmail, subject, body })
+//     });
+//     try {
+//         console.log(await response.json(), subject)
+//     } catch (error) {
+//         console.log(error)
         
-    }
-}
+//     }
+// }
 
 export const createRoleForUser = async (req, res) => {
     console.log('adding users: -');
@@ -81,7 +81,7 @@ export const createRoleForUser = async (req, res) => {
             sendWhatsAppMessage(phone, messageArr, process.env.INTERAKT_API_KEY, process.env.INTERAKT_BASE_URL, templateName);
         }
         
-        sendEmail(email, subject, body);
+        // sendEmail(email, subject, body);
 
         return res.status(201).json(new ApiResponse(201, roleObjAssigned, "ROLE FOR USER CREATED...!"));
 

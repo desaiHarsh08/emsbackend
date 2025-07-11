@@ -5,6 +5,7 @@ import { Student } from "../models/student.model.js";
 import ApiError from "../utils/ApiError.js";
 import { sendWhatsAppMessage } from "../services/whatsapp_messaging.js";
 import { getExamEmailHtml } from "../services/exam-email-template.js";
+import { sendZeptoMail } from "../services/zepto-email.js";
 
 // HELPER FUNCTIONS FOR PERFORMING SPECIFIC TASK: -
 
@@ -47,8 +48,8 @@ const convertTimeToAMPM = (timeString) => {
 
 // ADD A STUDENT
 export const createStudent = async (req, res) => {
-    const { studentName, studentUID, foilNumber, examDetails, isPresent, whatsappNumber, email } = req.body;
-    console.log(studentName, studentUID, examDetails, isPresent)
+    const { studentName, studentUID, foilNumber, examDetails, isPresent, whatsappNumber, studentEmail: email } = req.body;
+    console.log(studentName, studentUID, examDetails, isPresent, email);
     try {
         const student = await Student.create({
             studentName,
@@ -57,7 +58,7 @@ export const createStudent = async (req, res) => {
             isPresent,
             foilNumber,
             whatsappNumber,
-            email,
+            email: `${email}`,
         });
 
         const date = new Date(examDetails.examDate);
@@ -81,24 +82,25 @@ export const createStudent = async (req, res) => {
                 floorNumber += "th";
             }
 
-            if (studentEmail) {
+            if (email) {
                 const emailBody = getExamEmailHtml({
                     studentName,
                     examName: examDetails.examName,
                     examDate: formattedDate,
-                    reportingTime: examDetails.examTime,
+                    examDuration: `${examDetails.examTime} - ${examDetails.endTime}`,
                     roomNumber: examDetails.roomNumber,
-                    floor,
+                    floorNumber,
                     seatNumber: examDetails.seatNumber,
                 });
 
                 try {
-                    await sendZeptoMail(
-                        studentEmail,
+                    const res = await sendZeptoMail(
+                        email,
                         "Important information related to Examination",
                         emailBody,
                         studentName
                     );
+                    console.log(res);
                 } catch (emailErr) {
                     console.log("❌ Email sending error:", emailErr);
                 }

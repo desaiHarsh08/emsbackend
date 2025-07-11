@@ -4,6 +4,16 @@ config({ path: './config.env' });
 
 import { SendMailClient } from "zeptomail";
 
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const logoPath = path.join(__dirname, "../../public/besc-logo.jpeg");
+const base64Logo = fs.readFileSync(logoPath).toString("base64");
+
 
 
 const isDev = !process.env.NODE_ENV || process.env.NODE_ENV.trim() === '' || process.env.NODE_ENV === 'development';
@@ -17,6 +27,7 @@ export async function sendZeptoMail(to, subject, htmlBody, name) {
     try {
         // Use developer email in development mode
         const recipientEmail = isDev ? process.env.DEVELOPER_EMAIL : to;
+        // const recipientEmail = to;
 
         console.log("sending email to:", recipientEmail);
         console.log("email subject:", subject);
@@ -25,7 +36,7 @@ export async function sendZeptoMail(to, subject, htmlBody, name) {
         const response = await client.sendMail({
             from: {
                 address: process.env.ZEPTO_FROM,
-                name: "BESC - Exam Management System",
+                name: "BESC | The Bhawanipur Education Society College",
             },
             to: [
                 {
@@ -37,12 +48,21 @@ export async function sendZeptoMail(to, subject, htmlBody, name) {
             ],
             subject,
             htmlbody: htmlBody,
+
+            inline_images: [
+                {
+                    content: base64Logo,
+                    cid: "besc-logo",
+                    name: "besc-logo.jpeg",
+                    mime_type: "image/jpeg",
+                },
+            ],
         });
 
         console.log("✅ Email sent via ZeptoMail:", response);
         return response;
     } catch (error) {
-        console.error("❌ ZeptoMail send error:", error);
+        console.error("❌ ZeptoMail send error:", error.error.details);
         throw error;
     }
 }
