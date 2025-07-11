@@ -4,6 +4,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { Student } from "../models/student.model.js";
 import ApiError from "../utils/ApiError.js";
 import { sendWhatsAppMessage } from "../services/whatsapp_messaging.js";
+import { getExamEmailHtml } from "../services/exam-email-template.js";
 
 // HELPER FUNCTIONS FOR PERFORMING SPECIFIC TASK: -
 
@@ -46,7 +47,7 @@ const convertTimeToAMPM = (timeString) => {
 
 // ADD A STUDENT
 export const createStudent = async (req, res) => {
-    const { studentName, studentUID, foilNumber, examDetails, isPresent, whatsappNumber } = req.body;
+    const { studentName, studentUID, foilNumber, examDetails, isPresent, whatsappNumber, email } = req.body;
     console.log(studentName, studentUID, examDetails, isPresent)
     try {
         const student = await Student.create({
@@ -56,6 +57,7 @@ export const createStudent = async (req, res) => {
             isPresent,
             foilNumber,
             whatsappNumber,
+            email,
         });
 
         const date = new Date(examDetails.examDate);
@@ -77,6 +79,29 @@ export const createStudent = async (req, res) => {
             }
             else {
                 floorNumber += "th";
+            }
+
+            if (studentEmail) {
+                const emailBody = getExamEmailHtml({
+                    studentName,
+                    examName: examDetails.examName,
+                    examDate: formattedDate,
+                    reportingTime: examDetails.examTime,
+                    roomNumber: examDetails.roomNumber,
+                    floor,
+                    seatNumber: examDetails.seatNumber,
+                });
+
+                try {
+                    await sendZeptoMail(
+                        studentEmail,
+                        "Important information related to Examination",
+                        emailBody,
+                        studentName
+                    );
+                } catch (emailErr) {
+                    console.log("❌ Email sending error:", emailErr);
+                }
             }
 
             waResult = await sendWhatsAppMessage(

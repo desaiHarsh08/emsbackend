@@ -9,7 +9,7 @@ import ApiError from "../utils/ApiError.js";
 import fetch from "node-fetch"
 import { sendWhatsAppMessage } from "../services/whatsapp_messaging.js";
 import { Exam } from "../models/exam.model.js";
-import { sendZeptoMail } from "../services/zept-email.js";
+import { sendZeptoMail } from "../services/zepto-email.js";
 
 
 const sendOTP = async (recipientEmail, otp, username) => {

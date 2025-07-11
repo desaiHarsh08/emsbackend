@@ -1,14 +1,12 @@
 import 'dotenv/config';
 import { config } from 'dotenv';
-config({path: './config.env'});
+config({ path: './config.env' });
 
 import { SendMailClient } from "zeptomail";
 
 
 
-console.log("ZeptoMail URL:", process.env.ZEPTO_URL);
-console.log("ZeptoMail FROM:", process.env.ZEPTO_FROM);
-console.log(`Zoho-enczapikey ${process.env.ZEPTO_TOKEN}`);
+const isDev = !process.env.NODE_ENV || process.env.NODE_ENV.trim() === '' || process.env.NODE_ENV === 'development';
 
 const client = new SendMailClient({
     url: process.env.ZEPTO_URL,
@@ -18,7 +16,7 @@ const client = new SendMailClient({
 export async function sendZeptoMail(to, subject, htmlBody, name) {
     try {
         // Use developer email in development mode
-        const recipientEmail = process.env.NODE_ENV === 'development' ? process.env.DEVELOPER_EMAIL : to;
+        const recipientEmail = isDev ? process.env.DEVELOPER_EMAIL : to;
 
         console.log("sending email to:", recipientEmail);
         console.log("email subject:", subject);

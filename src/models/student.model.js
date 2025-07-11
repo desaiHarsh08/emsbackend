@@ -19,6 +19,10 @@ const studentSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    email: {
+        type: String,
+        default: ''
+    },
     foilNumber: {
         type: String,
         default: ''
